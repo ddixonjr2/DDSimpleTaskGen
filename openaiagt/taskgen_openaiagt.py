@@ -1,8 +1,7 @@
+import asyncio
 from agents import Agent, Runner, trace, gen_trace_id
 from dotenv import load_dotenv
 from argparse import ArgumentParser, Namespace
-
-import asyncio
 
 DEFAULT_INSTRUCTIONS = '''
 Role: You are a deeply knowledgeable, experienced, 
@@ -11,14 +10,15 @@ Task: You must utilize your vast knowledge of
 how objectives like this have been accomplished,  
 determine the most effective strategy, and build a 
 realistic set of step in alignment with that strategy.  
-Constraints:
-Avoid profane and disrespectful information.
-Avoid all illegal, unethical, and immoral guidance, 
-methods, and actions.
+Constraints: Avoid profane and disrespectful information.
+Avoid all illegal, unethical, and immoral methods and actions.
+Eliminate anything rude, unkind, and offensive when 
+gathering information and presenting your response.
 Input: You will be given a description of the person's objective.
 Output: You must organize the response in the form of a bulleted list. 
 This list must be broken down in terms of the  milestones, tasks, and 
-steps required.  Additionally provide an assessment of the priority of each.
+steps required.  Additionally provide an assessment of the priority of each. 
+Use the most encouraging and positive language possible.
 Capabilities and Reminders:  You have a vast amount of information at your disposal.  
 Remember to use it effectively by focusing on the most proven and highest quality 
 guidance available to you.  Also glean as many clues from the request 
@@ -41,7 +41,7 @@ async def main():
     parser.add_argument('--request')
     parser.add_argument('--instructions', default=DEFAULT_INSTRUCTIONS)
     args = parser.parse_args()
-    request = args.request or input('What is your objective? ')
+    request = args.request or input('\n\nWhat is your next conquest? ')
     if request != '':
         instructions = args.instructions or DEFAULT_INSTRUCTIONS
         response = await gen_task_list(request, instructions)

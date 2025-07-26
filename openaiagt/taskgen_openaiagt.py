@@ -32,8 +32,13 @@ class TaskListGeneratorOAA():
         self.agent.instructions = instructions
         trace_id = gen_trace_id()
         with trace('Agent API Task List Generator v1', trace_id=trace_id):
-            response = await Runner.run(self.agent, input=request)
-            return response.final_output
+            try:
+                response = await Runner.run(self.agent, input=request)
+                return response.final_output
+            except Exception as e:
+                header = 'I could not process your request for the following reason:'
+                footer = 'Please resolve the issue and try again.'
+                return f'{header}\n{e}\n\n{footer}'
     
 async def main():
     load_dotenv()

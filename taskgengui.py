@@ -13,6 +13,7 @@ from customtkinter import (
 RESPONSE_INVALID_OBJECTIVE = 'Please enter a valid objective'
 RESPONSE_PLACEHOLDER = 'Your task list will appear here'
 REQUEST_PLACEHOLDER = 'Describe your end goal here'
+DEFAULT_TASKLIST_DIR = 'tasklists'
 
 # Helper Functions
 def write_new_result(text: str):
@@ -64,8 +65,11 @@ def save_button_pressed():
     if task_list_populated():
         fallback_dir = os.path.dirname(os.path.abspath(__file__))
         base_dir = os.getenv('HOME', fallback_dir)
+        tasklist_dir = os.path.join(base_dir, DEFAULT_TASKLIST_DIR)
+        os.makedirs(tasklist_dir, exist_ok=True)
+
         datestring = datetime.now().strftime('%m-%d-%Y_%H%M%S')
-        full_path = os.path.join(base_dir, f'tasklists/tasklist_{datestring}.txt')
+        full_path = os.path.join(tasklist_dir, f'tasklist_{datestring}.txt')
         with open(full_path, 'w') as outfile:
             outfile.write(current_task_list_text())
 

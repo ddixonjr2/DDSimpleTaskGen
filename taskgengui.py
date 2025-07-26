@@ -38,7 +38,10 @@ def task_list_populated() -> bool:
 async def gen_task_list(request: str):
     if request:
         set_is_busy(True)
-        response = await tgoa.gen_task_list(request, tgoa.DEFAULT_INSTRUCTIONS)
+        response = await generator.gen_task_list(
+            request=request, 
+            instructions=tgoa.DEFAULT_INSTRUCTIONS
+            )
         set_is_busy(False)
         return response
     else:
@@ -82,6 +85,7 @@ if __name__ == '__main__':
     set_appearance_mode('dark')
     set_default_color_theme('blue') 
 
+    generator = tgoa.TaskListGeneratorOAA()
     root = CTk()
     root.title('Task List Generator')
     root.geometry('700x500')

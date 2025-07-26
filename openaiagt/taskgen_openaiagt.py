@@ -24,19 +24,20 @@ Remember to use it effectively by focusing on the most proven and highest qualit
 guidance available to you.  Also glean as many clues from the request 
 to customize the response.
 '''
+class TaskListGeneratorOAA():
+    def __init__(self):
+        self.agent = Agent(name='Expert Project Planner and Task List Generator')
 
-async def gen_task_list(request: str, instructions: str) -> str:
-    task_list_agent = Agent(
-        name='Expert Project Planner and Task List Generator',
-        instructions=instructions
-    )
-    trace_id = gen_trace_id()
-    with trace('Agent API Task List Generator v1', trace_id=trace_id):
-        response = await Runner.run(task_list_agent, input=request)
-        return response.final_output
+    async def gen_task_list(self, request: str, instructions: str) -> str:
+        self.agent.instructions = instructions
+        trace_id = gen_trace_id()
+        with trace('Agent API Task List Generator v1', trace_id=trace_id):
+            response = await Runner.run(self.agent, input=request)
+            return response.final_output
     
 async def main():
     load_dotenv()
+    generator = TaskListGeneratorOAA()
     parser = ArgumentParser()
     parser.add_argument('--request')
     parser.add_argument('--instructions', default=DEFAULT_INSTRUCTIONS)
@@ -44,7 +45,7 @@ async def main():
     request = args.request or input('\n\nWhat is your next conquest? ')
     if request != '':
         instructions = args.instructions or DEFAULT_INSTRUCTIONS
-        response = await gen_task_list(request, instructions)
+        response = await generator.gen_task_list(request=request, instructions=instructions)
         print(response)
     else:
         print('\nSorry I cannot help without a description of what you would like to accomplish.')

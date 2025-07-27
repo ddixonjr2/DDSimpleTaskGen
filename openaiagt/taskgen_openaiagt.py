@@ -1,4 +1,5 @@
 import asyncio
+import messaging_common as msgc
 from agents import Agent, Runner, trace, gen_trace_id
 from dotenv import load_dotenv
 from argparse import ArgumentParser, Namespace
@@ -26,7 +27,7 @@ to customize the response.
 '''
 class TaskListGeneratorOAA():
     def __init__(self):
-        self.agent = Agent(name='Expert Project Planner and Task List Generator')
+        self.agent = Agent(name=msgc.TASKLIST_GEN_AGENT_NAME)
 
     async def gen_task_list(self, request: str, instructions: str) -> str:
         self.agent.instructions = instructions
@@ -36,8 +37,8 @@ class TaskListGeneratorOAA():
                 response = await Runner.run(self.agent, input=request)
                 return response.final_output
             except Exception as e:
-                header = 'I could not process your request for the following reason:'
-                footer = 'Please resolve the issue and try again.'
+                header = msgc.AGENT_ERROR_GENERIC_HEADER
+                footer = msgc.AGENT_ERROR_GENERIC_FOOTER
                 return f'{header}\n{e}\n\n{footer}'
     
 async def main():
@@ -47,14 +48,14 @@ async def main():
     parser.add_argument('--request')
     parser.add_argument('--instructions', default=DEFAULT_INSTRUCTIONS)
     args = parser.parse_args()
-    request = args.request or input('\n\nWhat is your next conquest? ')
+    request = args.request or input(f'\n\n{msgc.TASKLIST_GEN_PROMPT} ')
     if request != '':
         instructions = args.instructions or DEFAULT_INSTRUCTIONS
         response = await generator.gen_task_list(request=request, instructions=instructions)
         print(response)
     else:
-        print('\nSorry I cannot help without a description of what you would like to accomplish.')
-        print('Please try again by telling me your goal using the "--request" argument or by entering it when prompted.')
+        print(f'\n{msgc.REQUEST_ERROR_HEADER}')
+        print(f'{msgc.REQUEST_ERROR_FOOTER}')
 
 if __name__ == '__main__':
     asyncio.run(main())

@@ -3,30 +3,13 @@ import asyncio
 import os
 import tkinter as tk
 import messaging_common as msgc
-import taskgen_openaiagt as tgoa
-import taskgen_langchain as tglc
-import taskgen_crewai as tgca
 
-from enum import Enum
-from taskgenerator import TaskListGenerator
+from taskgenselection import TaskListGeneratorSelector, Engine
 from datetime import datetime
 from customtkinter import (
     CTk, CTkButton, CTkLabel, CTkFrame, CTkEntry, CTkTextbox, CTkFont, CTkOptionMenu,
     set_appearance_mode, set_default_color_theme
 )
-
-# Engine
-# An enum to represent the choices of implement ways to get the same outcome. 
-# `Engine` was the best non-conflicting name I could conjure for now to represent
-# a combination of framework/approach to deriving the same result. :)
-# As a learning method and evolution of the code, my plan is to add several more 
-# engines such as those that use frameworks like CrewAI and protocols 
-# like MCP--all selectable thorough the UI.
-
-class Engine(Enum):
-    LANGCHAIN = 'LangChain API'
-    OPENAIAGT = 'OpenAI Agent API'
-    CREWAI = 'CrewAI API'
 
 # Helper Functions
 def write_new_result(text: str):
@@ -47,24 +30,13 @@ def task_list_populated() -> bool:
     is_preset = task_list in [msgc.RESPONSE_PLACEHOLDER, msgc.RESPONSE_INVALID_OBJECTIVE]
     return not is_preset and len(task_list) > 0
 
-def set_task_generator(engine_selection: Engine):
-    # Retaining a global reference to the generator so that after selection,
-    # it can be used repeatedly instead of instantiating for every query.
-    global generator
-    match engine_selection:
-        case Engine.LANGCHAIN:
-            generator = tglc.TaskListGeneratorLC()
-        case Engine.OPENAIAGT:
-            generator = tgoa.TaskListGeneratorOAA()
-        case Engine.CREWAI:
-            generator = tgca.TaskListGeneratorCA()
-    print(f'Will now use {generator.__class__.__name__} to generate the task list.')
-
-
 # Async Task Generation Functions
 async def gen_task_list(request: str):
+    global engine, tasklistgen_selector
+
     if request:
         set_is_busy(True)
+        generator = tasklistgen_selector.cur_task_list_generator(engine)
         response = await generator.gen_task_list(
             request=request, 
             instructions=msgc.DEFAULT_INSTRUCTIONS
@@ -109,15 +81,8 @@ def exit_button_pressed():
     
 # Menu Action Functions
 def engine_menu_selection_made(selection: str):
-    print(f'Engine selection made: {selection}')
-    try:
-        engine_selected = Engine(selection)
-        print(f'Engine selection try block: {engine_selected}')
-    except:
-        engine_selected = Engine.OPENAIAGT
-        print(f'Engine selection except block: {engine_selected}')
-    
-    set_task_generator(engine_selected)
+    global engine
+    engine = Engine(selection) or None
     
 
 # Setup the UI window frame, controls, and then render
@@ -125,7 +90,6 @@ if __name__ == '__main__':
     set_appearance_mode('dark')
     set_default_color_theme('blue') 
 
-    generator = tgoa.TaskListGeneratorOAA()
     root = CTk()
     root.title(msgc.UI_MAIN_HEADER_TEXT)
     root.geometry('700x700')
@@ -149,7 +113,8 @@ if __name__ == '__main__':
     clear_button = CTkButton(entry_button_frame, text=msgc.UI_CLEAR_ENTRY_BUTTON_TEXT, command=clear_button_pressed)
     clear_button.pack(side='left', pady=10, padx=60)
     
-    set_task_generator(Engine.OPENAIAGT)
+    tasklistgen_selector = TaskListGeneratorSelector()
+    engine = Engine.OPENAIAGT
     engines = [str(Engine.OPENAIAGT.value), str(Engine.LANGCHAIN.value), str(Engine.CREWAI.value)]
     engine_menu = CTkOptionMenu(root, values=engines, command=engine_menu_selection_made)
     engine_menu.pack(pady=10, padx=20, fill='x')

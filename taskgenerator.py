@@ -1,6 +1,6 @@
 # An abstract class to define required interface for task generators
 
-from abc import ABC, abstractmethod 
+from abc import ABC, abstractmethod
 
 class TaskListGenerator(ABC):
     @abstractmethod

@@ -49,6 +49,7 @@ DEFAULT_TASKLIST_DIR = 'tasklists'
 
 UI_MAIN_HEADER_TEXT = 'Task List Generator'
 UI_TASK_OBJECTIVE_PROMPT = 'What is your next conquest?'
+UI_API_SELECTOR_TITLE = 'Agent API'
 UI_CLEAR_ENTRY_BUTTON_TEXT = 'Clear Entry'
 UI_GENERATE_BUTTON_TEXT = 'Generate Task List'
 UI_SAVE_BUTTON_TEXT = 'Save Task List'

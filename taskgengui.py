@@ -5,6 +5,7 @@ import tkinter as tk
 import messaging_common as msgc
 import taskgen_openaiagt as tgoa
 import taskgen_langchain as tglc
+import taskgen_crewai as tgca
 
 from enum import Enum
 from taskgenerator import TaskListGenerator
@@ -25,6 +26,7 @@ from customtkinter import (
 class Engine(Enum):
     LANGCHAIN = 'LangChain API'
     OPENAIAGT = 'OpenAI Agent API'
+    CREWAI = 'CrewAI API'
 
 # Helper Functions
 def write_new_result(text: str):
@@ -54,6 +56,10 @@ def set_task_generator(engine_selection: Engine):
             generator = tglc.TaskListGeneratorLC()
         case Engine.OPENAIAGT:
             generator = tgoa.TaskListGeneratorOAA()
+        case Engine.CREWAI:
+            generator = tgca.TaskListGeneratorCA()
+    print(f'Will now use {generator.__class__.__name__} to generate the task list.')
+
 
 # Async Task Generation Functions
 async def gen_task_list(request: str):
@@ -144,7 +150,7 @@ if __name__ == '__main__':
     clear_button.pack(side='left', pady=10, padx=60)
     
     set_task_generator(Engine.OPENAIAGT)
-    engines = [str(Engine.OPENAIAGT.value), str(Engine.LANGCHAIN.value)]
+    engines = [str(Engine.OPENAIAGT.value), str(Engine.LANGCHAIN.value), str(Engine.CREWAI.value)]
     engine_menu = CTkOptionMenu(root, values=engines, command=engine_menu_selection_made)
     engine_menu.pack(pady=10, padx=20, fill='x')
 

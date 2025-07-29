@@ -3,7 +3,7 @@ from taskgenerator import TaskListGenerator
 from messaging_common import *
 from agents import Agent, Runner, trace, gen_trace_id
 from dotenv import load_dotenv
-from argparse import ArgumentParser, Namespace
+from requestargparse import TaskListGen_ArgParser
 
 class TaskListGeneratorOAA(TaskListGenerator):
     def __init__(self):
@@ -25,18 +25,17 @@ class TaskListGeneratorOAA(TaskListGenerator):
 async def main():
     load_dotenv()
     generator = TaskListGeneratorOAA()
-    parser = ArgumentParser()
-    parser.add_argument('--request')
-    parser.add_argument('--instructions', default=DEFAULT_INSTRUCTIONS)
-    args = parser.parse_args()
-    request = args.request or input(f'\n\n{TASKLIST_GEN_PROMPT} ')
-    if request != '':
-        instructions = args.instructions or DEFAULT_INSTRUCTIONS
+    request_parser = TaskListGen_ArgParser()
+    request = request_parser.request or input(f'{UI_TASK_OBJECTIVE_PROMPT} ')
+    instructions = request_parser.instructions
+
+    if request and request != '':
+        print('Working on your task list...')
         response = await generator.gen_task_list(request=request, instructions=instructions)
-        print(response)
+        print(f'\n\n{response}')
     else:
-        print(f'\n{REQUEST_ERROR_HEADER}')
-        print(f'{REQUEST_ERROR_FOOTER}')
+        response = f'\n{REQUEST_ERROR_HEADER}\n{REQUEST_ERROR_FOOTER}'
+        print(response)
 
 if __name__ == '__main__':
     asyncio.run(main())

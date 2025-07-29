@@ -4,7 +4,7 @@ import langchain_openai as lcoa
 from messaging_common import *
 
 from taskgenerator import TaskListGenerator
-from argparse import ArgumentParser
+from requestargparse import TaskListGen_ArgParser
 from dotenv import load_dotenv
 
 class TaskListGeneratorLC(TaskListGenerator):
@@ -25,12 +25,9 @@ class TaskListGeneratorLC(TaskListGenerator):
 async def main():
     load_dotenv()
     generator = TaskListGeneratorLC()
-    parser = ArgumentParser()
-    parser.add_argument('--request')
-    parser.add_argument('--instructions', default=DEFAULT_INSTRUCTIONS)
-    args = parser.parse_args()
-    request = args.request or input(f'\n\n{UI_TASK_OBJECTIVE_PROMPT} ')
-    instructions = args.instructions
+    request_parser = TaskListGen_ArgParser()
+    request = request_parser.request or input(f'{UI_TASK_OBJECTIVE_PROMPT} ')
+    instructions = request_parser.instructions
     
     if request and request != '':
         print('Working on your task list...')

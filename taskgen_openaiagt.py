@@ -30,7 +30,7 @@ async def main():
     instructions = request_parser.instructions
 
     if request and request != '':
-        print('Working on your task list...')
+        print(UI_INPROGRESS_TEXT)
         response = await generator.gen_task_list(request=request, instructions=instructions)
         print(f'\n\n{response}')
     else:

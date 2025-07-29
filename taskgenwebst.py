@@ -17,9 +17,9 @@ async def main():
     if ph_execute.button(UI_GENERATE_BUTTON_TEXT):
         ph_success.empty()
         ph_response.empty()
-        with st.spinner('Generating your response...'):
+        with st.spinner(UI_INPROGRESS_TEXT):
             response = await generator.gen_task_list(request=request, instructions=DEFAULT_INSTRUCTIONS)
-            ph_success.success('Yay!!! Here\'s your tasklist!')
+            ph_success.success(UI_COMPLETION_HEADER_TEXT)
             ph_response.markdown(f'\n{response}\n')
 
 if __name__ == '__main__':
